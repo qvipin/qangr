@@ -24,9 +24,13 @@ path_to_binary = args.binary # Binary Path Here
 from pwn import context, ELF # Import moved here due to ArgParse issues
 
 """Binary Info"""
-if args.binary_info:
-    context.log_level = 'warning'
-    print(ELF(path_to_binary))
+try:
+    if args.binary_info:
+        context.log_level = 'warning'
+        print(ELF(path_to_binary))
+except FileNotFoundError:
+    print("usage: qangr [-h] -g <0x00000> [-b <0x00000>] [-B <0x00000 or auto>] [--DFS] [--binary-info] [--angr-logging-level {DEBUG,INFO}] <binary>\nqangr: error: the following arguments are required: <binary>")
+
 
 """ WIP
 if not sys.maxsize > 2**32 and binary.arch != ["i386", "amd64"]:
