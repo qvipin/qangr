@@ -12,7 +12,7 @@ Run these commands to quickly add it to your path.
 git clone https://github.com/qvipin/qangr.git
 cd qangr/
 pip install -r requirements.txt
-mv qangr.py qangr && sudo cp qangr /usr/local/bin
+sudo cp qangr.py /usr/local/bin/qangr
 qangr
 ```
 
