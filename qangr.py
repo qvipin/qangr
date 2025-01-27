@@ -15,6 +15,7 @@ parser.add_argument("-g", "--good-address", metavar="<0x00000>", help='Good Addr
 parser.add_argument("-b", "--bad-address", metavar="<0x00000>", help='Bad Address (e.g. puts(str: "Incorrect!"))', required=False)
 parser.add_argument("-B", "--base-address", metavar="<0x00000 or auto>", help='Base Address; Use 0x400000 or Specify AUTO for PIE Binaries (Default is `0x000000`)', required=False)
 parser.add_argument("--DFS", action='store_true', help='Uses DFS exploration instead of the default BFS Exploration', required=False)
+parser.add_argument("-NOALL", "-noall", "--No-Auto-Load-Libs", action='store_true', help='Avoid unnecessary exploration of system libraries (e.g., libc, ld-linux) irrelevent to symbolic execution goals.', required=False)
 parser.add_argument("--binary-info", action='store_true', help='Specify argument for additional binary information.', required=False)
 parser.add_argument("--angr-logging-level", help='Logging level for angr (Default: WARNING and higher). Use --angr-logging-level=<value>.', choices=["DEBUG", "INFO"],  required=False)
 
@@ -29,8 +30,7 @@ try:
         context.log_level = 'warning'
         print(ELF(path_to_binary))
 except FileNotFoundError:
-    print("usage: qangr [-h] -g <0x00000> [-b <0x00000>] [-B <0x00000 or auto>] [--DFS] [--binary-info] [--angr-logging-level {DEBUG,INFO}] <binary>\nqangr: error: the following arguments are required: <binary>")
-
+    parser.print_help(sys.stderr)
 
 """ WIP
 if not sys.maxsize > 2**32 and binary.arch != ["i386", "amd64"]:
@@ -44,7 +44,11 @@ try:
         logging.getLogger('angr').setLevel(f'{args.angr_logging_level}')
     logging.getLogger("pwnlib.elf.elf").setLevel(logging.ERROR)
 
-    project = angr.Project(path_to_binary, auto_load_libs=False) 
+    if args.No_Auto_Load_Libs: # checking for -NOALL
+        project = angr.Project(path_to_binary, auto_load_libs=False) 
+    else:
+        project = angr.Project(path_to_binary) 
+
 
 # base address checks
     if args.base_address is None:
